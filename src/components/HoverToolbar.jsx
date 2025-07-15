@@ -20,13 +20,13 @@ import {
 } from '@mui/icons-material';
 import { useFishboneData } from '../hooks/useFishboneData';
 
-function HoverToolbar({ node, onEdit, onDelete, onAddSubnode }) {
+function HoverToolbar({ node, onEdit, onDelete, onAddSubnode, onMouseEnter, onMouseLeave }) {
   const { dispatch } = useFishboneData();
   const [commentDialog, setCommentDialog] = useState({ open: false, comment: node.comment || '' });
 
-  // Position the toolbar near the node
-  const toolbarX = node.x + 60;
-  const toolbarY = node.y - 20;
+  // Position the toolbar overlapping the node for easier clicking
+  const toolbarX = node.x + 30; // Closer to node
+  const toolbarY = node.y - 10; // Slightly overlapping
 
   const handleCommentSave = () => {
     const comment = commentDialog.comment;
@@ -72,6 +72,8 @@ function HoverToolbar({ node, onEdit, onDelete, onAddSubnode }) {
           zIndex: 1000,
           pointerEvents: 'auto',
         }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         <Paper
           elevation={8}

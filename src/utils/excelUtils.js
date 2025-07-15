@@ -23,6 +23,7 @@ export function exportToExcel(state) {
       Comments: '',
       X: category.x,
       Y: category.y,
+      SpineX: category.spineX || 0,
     });
 
     // Add causes
@@ -34,6 +35,7 @@ export function exportToExcel(state) {
         Comments: cause.comment || '',
         X: cause.x,
         Y: cause.y,
+        SpineX: '',
       });
 
       // Add subcauses
@@ -45,6 +47,7 @@ export function exportToExcel(state) {
           Comments: subcause.comment || '',
           X: subcause.x,
           Y: subcause.y,
+          SpineX: '',
         });
       });
     });
@@ -114,6 +117,7 @@ function parseExcelData(jsonData) {
     const comments = row.Comments || '';
     const x = parseFloat(row.X) || 0;
     const y = parseFloat(row.Y) || 0;
+    const spineX = parseFloat(row.SpineX) || null;
 
     // Initialize category if it doesn't exist
     if (!categories.has(categoryName)) {
@@ -122,6 +126,7 @@ function parseExcelData(jsonData) {
         name: categoryName,
         x: x,
         y: y,
+        spineX: spineX,
         causes: [],
       });
     }

@@ -9,6 +9,7 @@ function FishboneCanvas() {
   const svgRef = useRef(null);
   const [editDialog, setEditDialog] = useState({ open: false, type: '', data: null });
   const [hoveredNode, setHoveredNode] = useState(null);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
   const [dragState, setDragState] = useState({ isDragging: false, nodeData: null, offset: { x: 0, y: 0 } });
 
   const canvasWidth = 1200;
@@ -70,6 +71,20 @@ function FishboneCanvas() {
     });
   };
 
+  // Handle spine connection point dragging
+  const handleSpinePointMouseDown = (event, category) => {
+    event.preventDefault();
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const spineConnectionX = category.spineX || (200 + (state.categories.indexOf(category) * 100));
+    
+    setDragState({
+      isDragging: true,
+      nodeData: { ...category, type: 'spinePoint' },
+      offset: { x: x - spineConnectionX, y: 0 },
+    });
+  };
+
   const handleMouseMove = (event) => {
     if (!dragState.isDragging) return;
     
@@ -103,6 +118,13 @@ function FishboneCanvas() {
           updates: { x, y },
         },
       });
+    } else if (nodeData.type === 'spinePoint') {
+      // Constrain spine point to only move horizontally along the spine
+      const constrainedX = Math.max(100, Math.min(canvasWidth - 300, x));
+      dispatch({
+        type: 'UPDATE_CATEGORY',
+        payload: { id: nodeData.id, updates: { spineX: constrainedX } },
+      });
     }
   };
 
@@ -110,21 +132,63 @@ function FishboneCanvas() {
     setDragState({ isDragging: false, nodeData: null, offset: { x: 0, y: 0 } });
   };
 
+  // Improved hover handling with delays
+  const handleNodeMouseEnter = (nodeData) => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    setHoveredNode(nodeData);
+  };
+
+  const handleNodeMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setHoveredNode(null);
+    }, 200); // 200ms delay before hiding
+    setHoverTimeout(timeout);
+  };
+
+  const handleToolbarMouseEnter = () => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+  };
+
+  const handleToolbarMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setHoveredNode(null);
+    }, 100); // Shorter delay when leaving toolbar
+    setHoverTimeout(timeout);
+  };
+
   // Render connection lines
   const renderConnections = () => {
     const lines = [];
     
-    state.categories.forEach(category => {
+    state.categories.forEach((category, index) => {
+      // Calculate connection point along spine based on category position
+      const spineConnectionX = category.spineX || (200 + (index * 100));
+      
       // Draw line from category to spine
       lines.push(
         <line
           key={`spine-${category.id}`}
           x1={category.x}
           y1={category.y}
-          x2={canvasWidth - 200}
+          x2={spineConnectionX}
           y2={spineY}
-          stroke="#6750A4"
+          stroke="#FF8C00"
           strokeWidth="2"
+        />
+      );
+      
+      // Draw connection point indicator on spine
+      lines.push(
+        <circle
+          key={`spine-point-${category.id}`}
+          cx={spineConnectionX}
+          cy={spineY}
+          r="4"
+          fill="#FF8C00"
+          stroke="#E67300"
+          strokeWidth="1"
+          style={{ cursor: 'grab' }}
+          onMouseDown={(e) => handleSpinePointMouseDown(e, category)}
         />
       );
       
@@ -137,7 +201,7 @@ function FishboneCanvas() {
             y1={cause.y}
             x2={category.x}
             y2={category.y}
-            stroke="#625B71"
+            stroke="#6B7280"
             strokeWidth="1.5"
           />
         );
@@ -151,7 +215,7 @@ function FishboneCanvas() {
               y1={subcause.y}
               x2={cause.x}
               y2={cause.y}
-              stroke="#7D7489"
+              stroke="#87CEEB"
               strokeWidth="1"
             />
           );
@@ -178,7 +242,7 @@ function FishboneCanvas() {
           y1={spineY}
           x2={canvasWidth - 200}
           y2={spineY}
-          stroke="#6750A4"
+          stroke="#6B7280"
           strokeWidth="4"
         />
         
@@ -189,7 +253,7 @@ function FishboneCanvas() {
             y={spineY - 30}
             width={160}
             height={60}
-            fill="#6750A4"
+            fill="#FF8C00"
             rx="8"
             onClick={handleProblemStatementClick}
             style={{ cursor: 'pointer' }}
@@ -220,8 +284,8 @@ function FishboneCanvas() {
             node={category}
             type="category"
             onMouseDown={(e) => handleMouseDown(e, category, 'category')}
-            onMouseEnter={() => setHoveredNode({ ...category, type: 'category' })}
-            onMouseLeave={() => setHoveredNode(null)}
+            onMouseEnter={() => handleNodeMouseEnter({ ...category, type: 'category' })}
+            onMouseLeave={handleNodeMouseLeave}
             onEdit={(text) => setEditDialog({ open: true, type: 'category', data: { ...category, text } })}
             onDelete={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}
             onAddSubnode={() => dispatch({ type: 'ADD_CAUSE', payload: { categoryId: category.id } })}
@@ -236,8 +300,8 @@ function FishboneCanvas() {
               node={cause}
               type="cause"
               onMouseDown={(e) => handleMouseDown(e, cause, 'cause', category.id)}
-              onMouseEnter={() => setHoveredNode({ ...cause, type: 'cause', categoryId: category.id })}
-              onMouseLeave={() => setHoveredNode(null)}
+              onMouseEnter={() => handleNodeMouseEnter({ ...cause, type: 'cause', categoryId: category.id })}
+              onMouseLeave={handleNodeMouseLeave}
               onEdit={(text) => setEditDialog({ 
                 open: true, 
                 type: 'cause', 
@@ -264,13 +328,13 @@ function FishboneCanvas() {
                 node={subcause}
                 type="subcause"
                 onMouseDown={(e) => handleMouseDown(e, subcause, 'subcause', category.id, cause.id)}
-                onMouseEnter={() => setHoveredNode({ 
+                onMouseEnter={() => handleNodeMouseEnter({ 
                   ...subcause, 
                   type: 'subcause', 
                   categoryId: category.id, 
                   causeId: cause.id 
                 })}
-                onMouseLeave={() => setHoveredNode(null)}
+                onMouseLeave={handleNodeMouseLeave}
                 onEdit={(text) => setEditDialog({ 
                   open: true, 
                   type: 'subcause', 
@@ -290,6 +354,8 @@ function FishboneCanvas() {
       {hoveredNode && (
         <HoverToolbar
           node={hoveredNode}
+          onMouseEnter={handleToolbarMouseEnter}
+          onMouseLeave={handleToolbarMouseLeave}
           onEdit={() => {
             const text = hoveredNode.name;
             if (hoveredNode.type === 'category') {

@@ -5,12 +5,12 @@ const FishboneContext = createContext();
 
 // Default template categories
 const defaultCategories = [
-  { id: uuidv4(), name: 'People', x: 200, y: 100, causes: [] },
-  { id: uuidv4(), name: 'Process', x: 400, y: 100, causes: [] },
-  { id: uuidv4(), name: 'Materials', x: 600, y: 100, causes: [] },
-  { id: uuidv4(), name: 'Machines', x: 200, y: 400, causes: [] },
-  { id: uuidv4(), name: 'Measurements', x: 400, y: 400, causes: [] },
-  { id: uuidv4(), name: 'Environment', x: 600, y: 400, causes: [] },
+  { id: uuidv4(), name: 'People', x: 200, y: 100, spineX: 250, causes: [] },
+  { id: uuidv4(), name: 'Process', x: 400, y: 100, spineX: 350, causes: [] },
+  { id: uuidv4(), name: 'Materials', x: 600, y: 100, spineX: 450, causes: [] },
+  { id: uuidv4(), name: 'Machines', x: 200, y: 400, spineX: 550, causes: [] },
+  { id: uuidv4(), name: 'Measurements', x: 400, y: 400, spineX: 650, causes: [] },
+  { id: uuidv4(), name: 'Environment', x: 600, y: 400, spineX: 750, causes: [] },
 ];
 
 const initialState = {
@@ -37,6 +37,7 @@ function fishboneReducer(state, action) {
         name: 'New Category',
         x: 300 + Math.random() * 200,
         y: 200 + Math.random() * 200,
+        spineX: 300 + (state.categories.length * 100),
         causes: [],
       };
       return { ...state, categories: [...state.categories, newCategory] };

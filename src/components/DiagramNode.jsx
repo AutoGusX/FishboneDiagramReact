@@ -10,13 +10,13 @@ function DiagramNode({
   onDelete, 
   onAddSubnode 
 }) {
-  // Different colors and sizes for different node types
+  // Different colors and sizes for different node types - Orange, Gray, Light Blue
   const getNodeStyle = () => {
     switch (type) {
       case 'category':
         return {
-          fill: '#6750A4',
-          stroke: '#4F378B',
+          fill: '#FF8C00', // Orange
+          stroke: '#E67300',
           strokeWidth: 2,
           width: 100,
           height: 40,
@@ -25,8 +25,8 @@ function DiagramNode({
         };
       case 'cause':
         return {
-          fill: '#625B71',
-          stroke: '#4A4458',
+          fill: '#6B7280', // Gray
+          stroke: '#4B5563',
           strokeWidth: 1.5,
           width: 80,
           height: 32,
@@ -35,8 +35,8 @@ function DiagramNode({
         };
       case 'subcause':
         return {
-          fill: '#7D7489',
-          stroke: '#625B71',
+          fill: '#87CEEB', // Light Blue
+          stroke: '#5BA7D9',
           strokeWidth: 1,
           width: 70,
           height: 28,
@@ -45,8 +45,8 @@ function DiagramNode({
         };
       default:
         return {
-          fill: '#6750A4',
-          stroke: '#4F378B',
+          fill: '#FF8C00', // Orange
+          stroke: '#E67300',
           strokeWidth: 2,
           width: 80,
           height: 32,

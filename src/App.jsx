@@ -5,26 +5,31 @@ import Sidebar from './components/Sidebar';
 import FishboneCanvas from './components/FishboneCanvas';
 import { FishboneProvider } from './hooks/useFishboneData';
 
-// Material Design 3 Theme
+// Material Design 3 Theme - White, Gray, Orange, Light Blue
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#6750A4',
-      light: '#7F67BE',
-      dark: '#4F378B',
+      main: '#FF8C00', // Orange
+      light: '#FFB347',
+      dark: '#E67300',
     },
     secondary: {
-      main: '#625B71',
-      light: '#7D7489',
-      dark: '#4A4458',
+      main: '#6B7280', // Gray
+      light: '#9CA3AF',
+      dark: '#4B5563',
+    },
+    info: {
+      main: '#87CEEB', // Light Blue
+      light: '#B6E5F7',
+      dark: '#5BA7D9',
     },
     surface: {
-      main: '#FEF7FF',
-      variant: '#E7E0EC',
+      main: '#FFFFFF',
+      variant: '#F5F5F5',
     },
     background: {
-      default: '#FEF7FF',
+      default: '#FFFFFF',
       paper: '#FFFFFF',
     },
   },
