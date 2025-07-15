@@ -1,0 +1,8 @@
+plm:
+  # Default pagination and query limits
+  default-limit: 25
+  max-limit: 100
+  # Default tenant configuration
+  default-tenant: "adskgusquade2023"
+  # Workflow configuration
+  lifecycle-workflow-id: "9223372036854775807" 
