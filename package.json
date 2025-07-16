@@ -2,7 +2,7 @@
   "name": "fishbone-diagram-tool",
   "version": "1.0.0",
   "description": "Interactive fishbone diagram tool with Material Design 3",
-  "homepage": "https://autogusx.github.io/FishboneDiagramReact/",
+  "homepage": "https://yourusername.github.io/fishbone-diagram-tool",
   "private": true,
   "dependencies": {
     "@mui/material": "^5.15.0",
